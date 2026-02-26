@@ -1,0 +1,23 @@
+# Build output
+target/
+bin/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Maven
+dependency-reduced-pom.xml
+pom.xml.asc
+
+# Plugin runtime
+*.jar
+!target/*.jar

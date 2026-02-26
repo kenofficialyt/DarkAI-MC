@@ -1,0 +1,37 @@
+name: DarkAI MC
+version: 1.0.0
+author: THT
+main: com.aiserver.assistant.AIPlugin
+description: AI-powered Minecraft server assistant
+
+commands:
+  ai:
+    description: AI Assistant main command
+    usage: /ai help
+    permission: ai.admin
+
+permissions:
+  ai.admin:
+    description: Full access to all AI commands
+    default: op
+  ai.fix:
+    description: Use /ai fix command
+    default: op
+  ai.scan:
+    description: Use /ai scan command
+    default: op
+  ai.build:
+    description: Use /ai build command
+    default: op
+  ai.item:
+    description: Use /ai item command
+    default: op
+  ai.trade:
+    description: Use /ai trade command
+    default: op
+  ai.scanplugins:
+    description: Use /ai scan-plugins command
+    default: op
+  ai.reload:
+    description: Use /ai reload command
+    default: op

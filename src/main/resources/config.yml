@@ -1,0 +1,26 @@
+ai:
+  provider: "openai"
+  openai-key: "YOUR_OPENAI_KEY_HERE"
+  anthropic-key: "YOUR_ANTHROPIC_KEY_HERE"
+  ollama-url: "http://localhost:11434"
+  model: "gpt-4"
+  max-tokens: 2000
+  temperature: 0.7
+
+features:
+  server-fixer: true
+  anti-cheat: true
+  building: true
+  item-creator: true
+  virus-scanner: true
+
+limits:
+  requests-per-minute: 10
+  auto-save-interval: 300
+
+anticheat:
+  enabled: true
+  log-suspicious: true
+  alert-threshold: 3
+
+language: "en"
