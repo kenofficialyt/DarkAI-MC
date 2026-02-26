@@ -62,16 +62,16 @@ AI-powered Minecraft server assistant plugin by **THT**
 - Protect your server from bad plugins
 
 ## Supported Versions
-- Minecraft 1.17+
-- Minecraft 1.18+
-- Minecraft 1.19+
-- Minecraft 1.20+
-- Minecraft 1.21+
+- Minecraft 1.17 - 1.21+
 
 ## Supported AI Providers
-- **OpenAI** (GPT-4)
-- **Anthropic** (Claude)
-- **Ollama** (Local/Llama2)
+- **OpenAI** (GPT-4, GPT-4o, GPT-4o-mini)
+- **Anthropic** (Claude 3.5 Sonnet, Claude 3 Opus)
+- **Ollama** (Local/Llama2, Mistral, etc.)
+- **Google Gemini**
+- **Codeium**
+- **GitHub Copilot**
+- **Custom OpenAI Compatible** (any OpenAI-compatible API)
 
 ## Commands
 
@@ -121,7 +121,7 @@ Edit `config.yml` to configure:
 
 ```yaml
 ai:
-  provider: "openai"          # openai, anthropic, ollama
+  provider: "openai"          # openai, anthropic, ollama, gemini, codeium, copilot, custom
   openai-key: "YOUR_KEY"     # Your API key
   model: "gpt-4"            # AI model
 
@@ -133,11 +133,15 @@ features:
   virus-scanner: true
   config-editor: true
 
+auto-save:
+  enabled: true
+  interval: 5  # minutes
+
 anticheat:
   enabled: true
   alert-threshold: 3
   ban-threshold: 3
-  
+   
   detection:
     movement: true
     combat: true
