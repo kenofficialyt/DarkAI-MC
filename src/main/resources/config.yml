@@ -13,6 +13,7 @@ features:
   building: true
   item-creator: true
   virus-scanner: true
+  config-editor: true
 
 limits:
   requests-per-minute: 10
@@ -22,5 +23,12 @@ anticheat:
   enabled: true
   log-suspicious: true
   alert-threshold: 3
+  ban-threshold: 3
+  
+  detection:
+    movement: true
+    combat: true
+    misc: true
+    advanced: true
 
 language: "en"

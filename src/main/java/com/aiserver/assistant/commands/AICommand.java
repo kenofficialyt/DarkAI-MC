@@ -26,6 +26,7 @@ public class AICommand implements CommandExecutor {
     private BuildingAssistant buildingAssistant;
     private ItemCreator itemCreator;
     private VirusScanner virusScanner;
+    private ConfigEditor configEditor;
 
     public AICommand(AIPlugin plugin) {
         this.plugin = plugin;
@@ -47,6 +48,9 @@ public class AICommand implements CommandExecutor {
         }
         if (plugin.getConfigUtils().getBoolean("features.virus-scanner", true)) {
             this.virusScanner = new VirusScanner(plugin);
+        }
+        if (plugin.getConfigUtils().getBoolean("features.config-editor", true)) {
+            this.configEditor = new ConfigEditor(plugin);
         }
     }
 
@@ -77,6 +81,7 @@ public class AICommand implements CommandExecutor {
             case "oraxen" -> handleOraxen(sender, args);
             case "mythicmobs", "mm" -> handleMythicMobs(sender, args);
             case "scan-plugins", "scanplugins" -> handleScanPlugins(sender);
+            case "config" -> handleConfig(sender, args);
             case "reload" -> handleReload(sender);
             default -> sender.sendMessage(translations.getWithColor("unknown-command"));
         }
@@ -453,6 +458,91 @@ public class AICommand implements CommandExecutor {
 
         plugin.reloadConfig();
         sender.sendMessage(translations.getWithColor("reloaded"));
+    }
+
+    private void handleConfig(CommandSender sender, String[] args) {
+        if (!PermissionManager.hasFixPermission(sender)) {
+            sender.sendMessage(translations.getWithColor("error.no-permission"));
+            return;
+        }
+
+        if (configEditor == null) {
+            sender.sendMessage(translations.getWithColor("error.feature-disabled"));
+            return;
+        }
+
+        if (!checkRateLimit(sender)) return;
+
+        if (args.length < 2) {
+            sender.sendMessage("&7=== Config Editor ===");
+            sender.sendMessage("&7/ai config view <plugin> - View plugin config");
+            sender.sendMessage("&7/ai config edit <plugin> <key> <value> - Edit config");
+            sender.sendMessage("&7/ai config analyze <plugin> - AI analyze config");
+            sender.sendMessage("&7/ai config backup <plugin> - Backup config");
+            return;
+        }
+
+        String action = args[1].toLowerCase();
+
+        switch (action) {
+            case "view" -> {
+                if (args.length < 3) {
+                    sender.sendMessage(translations.getWithColor("error.invalid-arguments"));
+                    return;
+                }
+                String pluginName = String.join(" ", java.util.Arrays.copyOfRange(args, 2, args.length));
+                sender.sendMessage(translations.getWithColor("prefix") + "Loading config...");
+                configEditor.viewConfig(pluginName).thenAccept(result -> {
+                    sender.sendMessage(translations.getWithColor("&f") + result);
+                }).exceptionally(e -> {
+                    sender.sendMessage(translations.getWithColor("error.ai-failure").replace("{error}", e.getMessage()));
+                    return null;
+                });
+            }
+            case "edit" -> {
+                if (args.length < 5) {
+                    sender.sendMessage("&cUsage: /ai config edit <plugin> <key> <value>");
+                    return;
+                }
+                String pluginName = args[2];
+                String key = args[3];
+                String value = String.join(" ", java.util.Arrays.copyOfRange(args, 4, args.length));
+                configEditor.editConfig(pluginName + " " + key + " " + value).thenAccept(result -> {
+                    sender.sendMessage(translations.getWithColor("&a") + result);
+                }).exceptionally(e -> {
+                    sender.sendMessage(translations.getWithColor("error.ai-failure").replace("{error}", e.getMessage()));
+                    return null;
+                });
+            }
+            case "analyze" -> {
+                if (args.length < 3) {
+                    sender.sendMessage(translations.getWithColor("error.invalid-arguments"));
+                    return;
+                }
+                String pluginName = String.join(" ", java.util.Arrays.copyOfRange(args, 2, args.length));
+                sender.sendMessage(translations.getWithColor("prefix") + "Analyzing config...");
+                configEditor.analyzeConfig(pluginName).thenAccept(result -> {
+                    sender.sendMessage(translations.getWithColor("&f") + result);
+                }).exceptionally(e -> {
+                    sender.sendMessage(translations.getWithColor("error.ai-failure").replace("{error}", e.getMessage()));
+                    return null;
+                });
+            }
+            case "backup" -> {
+                if (args.length < 3) {
+                    sender.sendMessage(translations.getWithColor("error.invalid-arguments"));
+                    return;
+                }
+                String pluginName = String.join(" ", java.util.Arrays.copyOfRange(args, 2, args.length));
+                configEditor.backupConfig(pluginName).thenAccept(result -> {
+                    sender.sendMessage(translations.getWithColor("&a") + result);
+                }).exceptionally(e -> {
+                    sender.sendMessage(translations.getWithColor("error.ai-failure").replace("{error}", e.getMessage()));
+                    return null;
+                });
+            }
+            default -> sender.sendMessage(translations.getWithColor("unknown-command"));
+        }
     }
 
     private boolean checkRateLimit(CommandSender sender) {
