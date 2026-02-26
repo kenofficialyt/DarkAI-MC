@@ -9,11 +9,37 @@ AI-powered Minecraft server assistant plugin by **THT**
 - Provides AI-powered solutions for server issues
 - Helps fix configurations and code problems
 
-### 🔒 Anti-Cheat AI
-- Real-time player behavior monitoring
-- Detects speed hacking, flying, teleporting
-- Flags suspicious players to staff
-- Stores violation history for analysis
+### 🔒 Anti-Cheat AI (Advanced)
+**Movement Detection:**
+- Speed hacking
+- Flying
+- Teleporting
+- Velocity
+- Jesus (water walking)
+- NoSlowdown
+
+**Combat Detection:**
+- Reach (illegal reach)
+- KillAura/AutoClicker
+- AimAssist
+- Rapid fire
+
+**Misc Detection:**
+- FastBreak
+- FastPlace
+- Scaffold
+- InventoryMove
+- BookBanning
+
+**Punishment System:**
+- 1st offense: Kick player
+- 3rd offense: Ban IP + Player
+
+### 🛠️ Config Editor
+- View any plugin config
+- Edit any plugin config
+- AI analyze plugin configs
+- Backup plugin configs
 
 ### 🏗️ Building Assistant
 - Generate structures from text descriptions
@@ -22,8 +48,12 @@ AI-powered Minecraft server assistant plugin by **THT**
 
 ### ⚔️ Item & Trade Creator
 - Create custom items with AI
+- MMOItems support
+- AdvancedEnchantments support
+- ItemsAdder support
+- Oraxen support
+- MythicMobs support
 - Design villager trades
-- Save custom items and trades to JSON
 
 ### 🔍 Virus Scanner
 - Scan plugins for malicious code
@@ -53,6 +83,15 @@ AI-powered Minecraft server assistant plugin by **THT**
 | `/ai build <desc>` | Build structure from description |
 | `/ai item <spec>` | Create custom item |
 | `/ai trade <spec>` | Create villager trade |
+| `/ai mmoitem <spec>` | Create MMOItems item |
+| `/ai enchant <spec>` | Create enchantment |
+| `/ai itemsadder <spec>` | Create ItemsAdder item |
+| `/ai oraxen <spec>` | Create Oraxen item |
+| `/ai mythicmobs <spec>` | Create MythicMobs item |
+| `/ai config view <plugin>` | View plugin config |
+| `/ai config edit <plugin> <key> <value>` | Edit config |
+| `/ai config analyze <plugin>` | AI analyze config |
+| `/ai config backup <plugin>` | Backup config |
 | `/ai scan-plugins` | Scan plugins for threats |
 | `/ai reload` | Reload configuration |
 
@@ -63,7 +102,7 @@ ai.admin        - Full access (default: op)
 ai.fix         - Use /ai fix
 ai.scan        - Use /ai scan  
 ai.build       - Use /ai build
-ai.item        - Use /ai item
+ai.item        - Use /ai item, mmoitem, enchant, etc.
 ai.trade       - Use /ai trade
 ai.scanplugins - Use /ai scan-plugins
 ai.reload      - Use /ai reload
@@ -92,6 +131,18 @@ features:
   building: true
   item-creator: true
   virus-scanner: true
+  config-editor: true
+
+anticheat:
+  enabled: true
+  alert-threshold: 3
+  ban-threshold: 3
+  
+  detection:
+    movement: true
+    combat: true
+    misc: true
+    advanced: true
 
 language: "en"              # en or vi
 ```
