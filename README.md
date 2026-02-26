@@ -101,7 +101,7 @@ language: "en"              # en or vi
 - Vietnamese (vi)
 
 ## License
-MIT License
+GPL-3.0 License
 
 ## Author
 **THT**
