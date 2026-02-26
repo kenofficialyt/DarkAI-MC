@@ -1,8 +1,29 @@
 ai:
   provider: "openai"
+  
+  # OpenAI (GPT-4)
   openai-key: "YOUR_OPENAI_KEY_HERE"
+  
+  # Anthropic (Claude)
   anthropic-key: "YOUR_ANTHROPIC_KEY_HERE"
+  
+  # Google Gemini
+  gemini-key: "YOUR_GEMINI_KEY_HERE"
+  
+  # Codeium
+  codeium-key: "YOUR_CODEIUM_KEY_HERE"
+  
+  # GitHub Copilot
+  copilot-key: "YOUR_COPILOT_KEY_HERE"
+  copilot-url: "https://api.github.com"
+  
+  # Custom OpenAI Compatible API
+  api-key: "YOUR_API_KEY_HERE"
+  base-url: "https://api.openai.com/v1"
+  
+  # Ollama (Local)
   ollama-url: "http://localhost:11434"
+  
   model: "gpt-4"
   max-tokens: 2000
   temperature: 0.7

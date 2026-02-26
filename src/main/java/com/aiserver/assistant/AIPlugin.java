@@ -94,7 +94,7 @@ public class AIPlugin extends JavaPlugin {
                 openAI.setTemperature(configUtils.getDouble("ai.temperature", 0.7));
                 aiProvider = openAI;
             }
-            case "anthropic" -> {
+            case "anthropic", "claude" -> {
                 AnthropicProvider anthropic = new AnthropicProvider();
                 anthropic.setApiKey(configUtils.getString("ai.anthropic-key", ""));
                 anthropic.setModel(configUtils.getString("ai.model", "claude-3-sonnet-20240229"));
@@ -109,6 +109,40 @@ public class AIPlugin extends JavaPlugin {
                 ollama.setMaxTokens(configUtils.getInt("ai.max-tokens", 2000));
                 ollama.setTemperature(configUtils.getDouble("ai.temperature", 0.7));
                 aiProvider = ollama;
+            }
+            case "gemini", "google" -> {
+                GeminiProvider gemini = new GeminiProvider();
+                gemini.setApiKey(configUtils.getString("ai.gemini-key", ""));
+                gemini.setModel(configUtils.getString("ai.model", "gemini-2.0-flash"));
+                gemini.setMaxTokens(configUtils.getInt("ai.max-tokens", 2000));
+                gemini.setTemperature(configUtils.getDouble("ai.temperature", 0.7));
+                aiProvider = gemini;
+            }
+            case "codeium" -> {
+                CodeiumProvider codeium = new CodeiumProvider();
+                codeium.setApiKey(configUtils.getString("ai.codeium-key", ""));
+                codeium.setModel(configUtils.getString("ai.model", "deepseek-coder-v2"));
+                codeium.setMaxTokens(configUtils.getInt("ai.max-tokens", 2000));
+                codeium.setTemperature(configUtils.getDouble("ai.temperature", 0.7));
+                aiProvider = codeium;
+            }
+            case "copilot", "github" -> {
+                OpenAICompatibleProvider copilot = new OpenAICompatibleProvider();
+                copilot.setApiKey(configUtils.getString("ai.copilot-key", ""));
+                copilot.setModel(configUtils.getString("ai.model", "gpt-4"));
+                copilot.setBaseUrl(configUtils.getString("ai.copilot-url", "https://api.github.com"));
+                copilot.setMaxTokens(configUtils.getInt("ai.max-tokens", 2000));
+                copilot.setTemperature(configUtils.getDouble("ai.temperature", 0.7));
+                aiProvider = copilot;
+            }
+            case "compatible", "custom" -> {
+                OpenAICompatibleProvider custom = new OpenAICompatibleProvider();
+                custom.setApiKey(configUtils.getString("ai.api-key", ""));
+                custom.setModel(configUtils.getString("ai.model", "gpt-4"));
+                custom.setBaseUrl(configUtils.getString("ai.base-url", "https://api.openai.com/v1"));
+                custom.setMaxTokens(configUtils.getInt("ai.max-tokens", 2000));
+                custom.setTemperature(configUtils.getDouble("ai.temperature", 0.7));
+                aiProvider = custom;
             }
             default -> {
                 getLogger().warning("Unknown AI provider: " + providerType + ", using OpenAI");
