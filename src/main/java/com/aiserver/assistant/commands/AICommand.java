@@ -73,6 +73,9 @@ public class AICommand implements CommandExecutor {
             case "fix" -> handleFix(sender, args);
             case "scan" -> handleScan(sender, args);
             case "build" -> handleBuild(sender, args);
+            case "schematic", "schem" -> handleSchematic(sender, args);
+            case "copy" -> handleCopy(sender);
+            case "paste" -> handlePaste(sender);
             case "item" -> handleItem(sender, args);
             case "trade" -> handleTrade(sender, args);
             case "mmoitem", "mmo" -> handleMMOItem(sender, args);
@@ -100,6 +103,9 @@ public class AICommand implements CommandExecutor {
         }
         if (PermissionManager.hasBuildPermission(sender)) {
             sender.sendMessage(translations.getWithColor("help.build"));
+            sender.sendMessage("&7/ai schem load <name> - Load schematic");
+            sender.sendMessage("&7/ai copy - Copy WorldEdit selection");
+            sender.sendMessage("&7/ai paste - Paste clipboard");
         }
         if (PermissionManager.hasItemPermission(sender)) {
             sender.sendMessage(translations.getWithColor("help.item"));
@@ -214,6 +220,94 @@ public class AICommand implements CommandExecutor {
         }).exceptionally(e -> {
             sender.sendMessage(translations.getWithColor("error.ai-failure").replace("{error}", e.getMessage()));
             return null;
+        });
+    }
+
+    private void handleSchematic(CommandSender sender, String[] args) {
+        if (!PermissionManager.hasBuildPermission(sender)) {
+            sender.sendMessage(translations.getWithColor("error.no-permission"));
+            return;
+        }
+
+        if (buildingAssistant == null) {
+            sender.sendMessage(translations.getWithColor("error.feature-disabled"));
+            return;
+        }
+
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(translations.getWithColor("&cThis command requires a player"));
+            return;
+        }
+
+        if (args.length < 2) {
+            sender.sendMessage("&7=== Schematic Commands ===");
+            sender.sendMessage("&7/ai schem load <name> - Load schematic");
+            if (buildingAssistant.hasFastAsyncWorldEdit()) {
+                sender.sendMessage("&aFAWE detected - Fast building enabled!");
+            } else if (buildingAssistant.hasWorldEdit()) {
+                sender.sendMessage("&eWorldEdit detected");
+            } else {
+                sender.sendMessage("&cNo WorldEdit detected - Using native builder");
+            }
+            return;
+        }
+
+        String action = args[1].toLowerCase();
+        
+        if (action.equals("load") && args.length >= 3) {
+            String schematicName = args[2];
+            sender.sendMessage(translations.getWithColor("prefix") + "Loading schematic...");
+            
+            buildingAssistant.buildSchematic(player, schematicName, player.getLocation()).thenAccept(result -> {
+                sender.sendMessage(translations.getWithColor("&a") + result);
+            }).exceptionally(e -> {
+                sender.sendMessage(translations.getWithColor("error.ai-failure").replace("{error}", e.getMessage()));
+                return null;
+            });
+        }
+    }
+
+    private void handleCopy(CommandSender sender) {
+        if (!PermissionManager.hasBuildPermission(sender)) {
+            sender.sendMessage(translations.getWithColor("error.no-permission"));
+            return;
+        }
+
+        if (buildingAssistant == null) {
+            sender.sendMessage(translations.getWithColor("error.feature-disabled"));
+            return;
+        }
+
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(translations.getWithColor("&cThis command requires a player"));
+            return;
+        }
+
+        sender.sendMessage(translations.getWithColor("&aUse WorldEdit selection and type //copy"));
+        buildingAssistant.copyRegion(player).thenAccept(result -> {
+            sender.sendMessage(translations.getWithColor("&f") + result);
+        });
+    }
+
+    private void handlePaste(CommandSender sender) {
+        if (!PermissionManager.hasBuildPermission(sender)) {
+            sender.sendMessage(translations.getWithColor("error.no-permission"));
+            return;
+        }
+
+        if (buildingAssistant == null) {
+            sender.sendMessage(translations.getWithColor("error.feature-disabled"));
+            return;
+        }
+
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(translations.getWithColor("&cThis command requires a player"));
+            return;
+        }
+
+        sender.sendMessage(translations.getWithColor("&aPasting at your location..."));
+        buildingAssistant.pasteRegion(player, player.getLocation()).thenAccept(result -> {
+            sender.sendMessage(translations.getWithColor("&f") + result);
         });
     }
 
