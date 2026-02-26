@@ -89,6 +89,260 @@ public class ItemCreator {
         });
     }
 
+    public CompletableFuture<String> createMMOItem(String spec) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                String prompt = String.format(
+                    "Create a MMOItems custom item. Generate a YAML-like JSON config:\n" +
+                    "{\n" +
+                    "  \"type\": \"SWORD\",\n" +
+                    "  \"id\": \"my_custom_sword\",\n" +
+                    "  \"name\": \"&cLegendary Sword\",\n" +
+                    "  \"lore\": [\"&7A powerful sword\", \"&e+100 Damage\"],\n" +
+                    "  \"tier\": \"LEGENDARY\",\n" +
+                    "  \"crafting\": {\"result\": 1, \"ingredients\": [\"DIAMOND_SWORD\", \"EMERALD\"]},\n" +
+                    "  \"stats\": {\n" +
+                    "    \"DAMAGE\": 100,\n" +
+                    "    \"ATTACK_SPEED\": 1.6,\n" +
+                    "    \"CRITICAL_CHANCE\": 25,\n" +
+                    "    \"CRITICAL_DAMAGE\": 150,\n" +
+                    "    \"HEALTH\": 500,\n" +
+                    "    \"DEFENSE\": 50\n" +
+                    "  },\n" +
+                    "  \"abilities\": [\n" +
+                    "    {\"name\": \"Fire Strike\", \"type\": \"PASSIVE\", \"damage\": 50}\n" +
+                    "  ],\n" +
+                    "  \"requirements\": {\"level\": 50},\n" +
+                    "  \"durability\": 1000,\n" +
+                    "  \"enchantments\": {\" sharpness\": 5, \"unbreaking\": 3 }\n" +
+                    "}\n\n" +
+                    "Item specification: %s\n\n" +
+                    "Valid types: SWORD, BOW, AXE, TRIDENT, TOOLS, ARMOR, ACCESSORY\n" +
+                    "Valid tiers: MYTHIC, LEGENDARY, EPIC, RARE, UNCOMMON, COMMON\n" +
+                    "Valid stats: DAMAGE, ATTACK_SPEED, CRITICAL_CHANCE, CRITICAL_DAMAGE, HEALTH, DEFENSE, MANA, REGENERATION\n" +
+                    "Output ONLY valid JSON, no explanation.",
+                    spec
+                );
+
+                String aiResponse = aiProvider.chat(prompt).join();
+                String jsonResponse = extractJson(aiResponse);
+                
+                if (jsonResponse == null) {
+                    return "Error: Could not parse MMOItem data";
+                }
+
+                JsonObject itemData = JsonParser.parseString(jsonResponse).getAsJsonObject();
+                String itemId = itemData.has("id") ? itemData.get("id").getAsString() : "unknown";
+                
+                saveMMOItemToFile(itemData);
+
+                return "MMOItem created: " + itemId + " (saved to data/mmoitems/)";
+
+            } catch (Exception e) {
+                return "Error creating MMOItem: " + e.getMessage();
+            }
+        });
+    }
+
+    public CompletableFuture<String> createEnchantment(String spec) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                String prompt = String.format(
+                    "Create a custom enchantment (AdvancedEnchantments format). Generate a JSON:\n" +
+                    "{\n" +
+                    "  \"name\": \"AutoSmelt\",\n" +
+                    "  \"id\": \"autosmelt\",\n" +
+                    "  \"displayName\": \"&cAuto Smelt\",\n" +
+                    "  \"description\": [\"&7Automatically smelts ores\"],\n" +
+                    "  \"type\": \"TOOL\",\n" +
+                    "  \"maxLevel\": 5,\n" +
+                    "  \"rarity\": \"MYTHIC\",\n" +
+                    "  \"glow\": true,\n" +
+                    "  \"tradeable\": true,\n" +
+                    "  \"enchantable\": false,\n" +
+                    "  \"conflicting\": [\"fortune\"],\n" +
+                    "  \"effects\": {\n" +
+                    "    \"onBlockBreak\": {\"smelt\": true, \"xpMultiplier\": 2.0}\n" +
+                    "  }\n" +
+                    "}\n\n" +
+                    "Enchantment specification: %s\n\n" +
+                    "Valid types: TOOL, ARMOR, BOW, SWORD, HELMET, CHESTPLATE, LEGGINGS, BOOTS\n" +
+                    "Valid rarities: MYTHIC, LEGENDARY, EPIC, RARE, UNCOMMON\n" +
+                    "Output ONLY valid JSON, no explanation.",
+                    spec
+                );
+
+                String aiResponse = aiProvider.chat(prompt).join();
+                String jsonResponse = extractJson(aiResponse);
+                
+                if (jsonResponse == null) {
+                    return "Error: Could not parse enchantment data";
+                }
+
+                JsonObject enchantData = JsonParser.parseString(jsonResponse).getAsJsonObject();
+                String enchantId = enchantData.has("id") ? enchantData.get("id").getAsString() : "unknown";
+                
+                saveEnchantmentToFile(enchantData);
+
+                return "Enchantment created: " + enchantId + " (saved to data/enchantments/)";
+
+            } catch (Exception e) {
+                return "Error creating enchantment: " + e.getMessage();
+            }
+        });
+    }
+
+    public CompletableFuture<String> createItemsAdder(String spec) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                String prompt = String.format(
+                    "Create an ItemsAdder custom item. Generate a JSON:\n" +
+                    "{\n" +
+                    "  \"namespace\": \"myitems\",\n" +
+                    "  \"id\": \"diamond_sword_v2\",\n" +
+                    "  \"name\": \"&cEpic Diamond Sword\",\n" +
+                    "  \"lore\": [\"&7A powerful sword\", \"&e+50 Damage\"],\n" +
+                    "  \"material\": \"DIAMOND_SWORD\",\n" +
+                    "  \"texture\": \"diamond_sword_v2\",\n" +
+                    "  \"model\": \"diamond_sword_v2\",\n" +
+                    "  \"color\": \"#FF0000\",\n" +
+                    "  \"enchantments\": {\"sharpness\": 10, \"unbreaking\": 5},\n" +
+                    "  \"attributes\": [\n" +
+                    "    {\"name\": \"generic.attackDamage\", \"amount\": 50, \"operation\": 0, \"slot\": \"mainhand\"}\n" +
+                    "  ],\n" +
+                    "  \"flags\": [\"HIDE_ENCHANTS\"],\n" +
+                    "  \"durability\": 1000,\n" +
+                    "  \"recipe\": {\n" +
+                    "    \"type\": \"shaped\",\n" +
+                    "    \"ingredients\": [\"DIAMOND\", \"EMERALD\"],\n" +
+                    "    \"result\": 1\n" +
+                    "  }\n" +
+                    "}\n\n" +
+                    "Item specification: %s\n\n" +
+                    "Output ONLY valid JSON, no explanation.",
+                    spec
+                );
+
+                String aiResponse = aiProvider.chat(prompt).join();
+                String jsonResponse = extractJson(aiResponse);
+                
+                if (jsonResponse == null) {
+                    return "Error: Could not parse ItemsAdder data";
+                }
+
+                JsonObject itemData = JsonParser.parseString(jsonResponse).getAsJsonObject();
+                String itemId = itemData.has("id") ? itemData.get("id").getAsString() : "unknown";
+                
+                saveItemsAdderToFile(itemData);
+
+                return "ItemsAdder item created: " + itemId + " (saved to data/itemsadder/)";
+
+            } catch (Exception e) {
+                return "Error creating ItemsAdder item: " + e.getMessage();
+            }
+        });
+    }
+
+    public CompletableFuture<String> createOraxen(String spec) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                String prompt = String.format(
+                    "Create an Oraxen custom item. Generate a JSON:\n" +
+                    "{\n" +
+                    "  \"id\": \"my_sword\",\n" +
+                    "  \"name\": \"&cLegendary Sword\",\n" +
+                    "  \"material\": \"DIAMOND_SWORD\",\n" +
+                    "  \"model\": \"sword_01\",\n" +
+                    "  \"lore\": [\"&7A legendary weapon\"],\n" +
+                    "  \"color\": \"#FF0000\",\n" +
+                    "  \"enchantments\": {\"sharpness\": 10},\n" +
+                    "  \"attributes\": [\n" +
+                    "    {\"slot\": \"mainhand\", \"attribute\": \"GENERIC_ATTACK_DAMAGE\", \"amount\": 100}\n" +
+                    "  ],\n" +
+                    "  \"mechanics\": {\n" +
+                    "    \"damage\": {\"base\": 50, \"multiplier\": 1.5}\n" +
+                    "  },\n" +
+                    "  \"recipe\": {\n" +
+                    "    \"type\": \"shaped\",\n" +
+                    "    \"pattern\": [\"X\", \"X\", \"Y\"],\n" +
+                    "    \"ingredients\": {\"X\": \"DIAMOND\", \"Y\": \"STICK\"}\n" +
+                    "  }\n" +
+                    "}\n\n" +
+                    "Item specification: %s\n\n" +
+                    "Output ONLY valid JSON, no explanation.",
+                    spec
+                );
+
+                String aiResponse = aiProvider.chat(prompt).join();
+                String jsonResponse = extractJson(aiResponse);
+                
+                if (jsonResponse == null) {
+                    return "Error: Could not parse Oraxen data";
+                }
+
+                JsonObject itemData = JsonParser.parseString(jsonResponse).getAsJsonObject();
+                String itemId = itemData.has("id") ? itemData.get("id").getAsString() : "unknown";
+                
+                saveOraxenToFile(itemData);
+
+                return "Oraxen item created: " + itemId + " (saved to data/oraxen/)";
+
+            } catch (Exception e) {
+                return "Error creating Oraxen item: " + e.getMessage();
+            }
+        });
+    }
+
+    public CompletableFuture<String> createMythicMobs(String spec) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                String prompt = String.format(
+                    "Create a MythicMobs item. Generate a JSON:\n" +
+                    "{\n" +
+                    "  \"id\": \"MythicSword\",\n" +
+                    "  \"name\": \"&cMythic Sword\",\n" +
+                    "  \"type\": \"SWORD\",\n" +
+                    "  \"material\": \"DIAMOND_SWORD\",\n" +
+                    "  \"lore\": [\"&7A mythic weapon\"],\n" +
+                    "  \"enchantments\": {\"sharpness\": 10, \"unbreaking\": 5},\n" +
+                    "  \"attributes\": [\n" +
+                    "    {\"name\": \"generic.attackDamage\", \"amount\": 100, \"operation\": 0}\n" +
+                    "  ],\n" +
+                    "  \"abilities\": [\n" +
+                    "    {\"name\": \"FireAspect\", \"type\": \"ON_HIT\", \"chance\": 50, \"damage\": 20}\n" +
+                    "  ],\n" +
+                    "  \"options\": {\n" +
+                    "    \"enchantmentOptions\": {\"glow\": true},\n" +
+                    "    \"godTier\": false,\n" +
+                    "    \"unbreakable\": true\n" +
+                    "  }\n" +
+                    "}\n\n" +
+                    "Item specification: %s\n\n" +
+                    "Valid types: SWORD, AXE, BOW, HELMET, CHESTPLATE, LEGGINGS, BOOTS, ANY\n" +
+                    "Output ONLY valid JSON, no explanation.",
+                    spec
+                );
+
+                String aiResponse = aiProvider.chat(prompt).join();
+                String jsonResponse = extractJson(aiResponse);
+                
+                if (jsonResponse == null) {
+                    return "Error: Could not parse MythicMobs data";
+                }
+
+                JsonObject itemData = JsonParser.parseString(jsonResponse).getAsJsonObject();
+                String itemId = itemData.has("id") ? itemData.get("id").getAsString() : "unknown";
+                
+                saveMythicMobsToFile(itemData);
+
+                return "MythicMobs item created: " + itemId + " (saved to data/mythicmobs/)";
+
+            } catch (Exception e) {
+                return "Error creating MythicMobs item: " + e.getMessage();
+            }
+        });
+    }
+
     public CompletableFuture<String> createTrade(String spec) {
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -128,6 +382,77 @@ public class ItemCreator {
                 return translations.get("trade.error").replace("{error}", e.getMessage());
             }
         });
+    }
+
+    private void saveMMOItemToFile(JsonObject itemData) {
+        try {
+            Path folder = dataPath.resolve("mmoitems");
+            Files.createDirectories(folder);
+            
+            String itemId = itemData.has("id") ? itemData.get("id").getAsString() : "item";
+            Path file = folder.resolve(itemId + ".json");
+            
+            try (FileWriter writer = new FileWriter(file.toFile())) {
+                writer.write(gson.toJson(itemData));
+            }
+        } catch (Exception ignored) {}
+    }
+
+    private void saveEnchantmentToFile(JsonObject enchantData) {
+        try {
+            Path folder = dataPath.resolve("enchantments");
+            Files.createDirectories(folder);
+            
+            String enchantId = enchantData.has("id") ? enchantData.get("id").getAsString() : "enchantment";
+            Path file = folder.resolve(enchantId + ".json");
+            
+            try (FileWriter writer = new FileWriter(file.toFile())) {
+                writer.write(gson.toJson(enchantData));
+            }
+        } catch (Exception ignored) {}
+    }
+
+    private void saveItemsAdderToFile(JsonObject itemData) {
+        try {
+            Path folder = dataPath.resolve("itemsadder");
+            Files.createDirectories(folder);
+            
+            String itemId = itemData.has("id") ? itemData.get("id").getAsString() : "item";
+            String namespace = itemData.has("namespace") ? itemData.get("namespace").getAsString() : "items";
+            Path file = folder.resolve(namespace + "_" + itemId + ".json");
+            
+            try (FileWriter writer = new FileWriter(file.toFile())) {
+                writer.write(gson.toJson(itemData));
+            }
+        } catch (Exception ignored) {}
+    }
+
+    private void saveOraxenToFile(JsonObject itemData) {
+        try {
+            Path folder = dataPath.resolve("oraxen");
+            Files.createDirectories(folder);
+            
+            String itemId = itemData.has("id") ? itemData.get("id").getAsString() : "item";
+            Path file = folder.resolve(itemId + ".json");
+            
+            try (FileWriter writer = new FileWriter(file.toFile())) {
+                writer.write(gson.toJson(itemData));
+            }
+        } catch (Exception ignored) {}
+    }
+
+    private void saveMythicMobsToFile(JsonObject itemData) {
+        try {
+            Path folder = dataPath.resolve("mythicmobs");
+            Files.createDirectories(folder);
+            
+            String itemId = itemData.has("id") ? itemData.get("id").getAsString() : "item";
+            Path file = folder.resolve(itemId + ".json");
+            
+            try (FileWriter writer = new FileWriter(file.toFile())) {
+                writer.write(gson.toJson(itemData));
+            }
+        } catch (Exception ignored) {}
     }
 
     private ItemStack createItemStack(JsonObject data) {

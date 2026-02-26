@@ -71,6 +71,11 @@ public class AICommand implements CommandExecutor {
             case "build" -> handleBuild(sender, args);
             case "item" -> handleItem(sender, args);
             case "trade" -> handleTrade(sender, args);
+            case "mmoitem", "mmo" -> handleMMOItem(sender, args);
+            case "enchant", "ae" -> handleEnchantment(sender, args);
+            case "itemsadder", "ia" -> handleItemsAdder(sender, args);
+            case "oraxen" -> handleOraxen(sender, args);
+            case "mythicmobs", "mm" -> handleMythicMobs(sender, args);
             case "scan-plugins", "scanplugins" -> handleScanPlugins(sender);
             case "reload" -> handleReload(sender);
             default -> sender.sendMessage(translations.getWithColor("unknown-command"));
@@ -80,7 +85,7 @@ public class AICommand implements CommandExecutor {
     }
 
     private void showHelp(CommandSender sender) {
-        sender.sendMessage(translations.translateColorCodes("&b=== AI Server Assistant ==="));
+        sender.sendMessage(translations.translateColorCodes("&b=== DarkAI MC ==="));
         
         if (PermissionManager.hasFixPermission(sender)) {
             sender.sendMessage(translations.getWithColor("help.fix"));
@@ -93,6 +98,11 @@ public class AICommand implements CommandExecutor {
         }
         if (PermissionManager.hasItemPermission(sender)) {
             sender.sendMessage(translations.getWithColor("help.item"));
+            sender.sendMessage("&7/ai mmoitem <spec> - Create MMOItems item");
+            sender.sendMessage("&7/ai enchant <spec> - Create custom enchantment");
+            sender.sendMessage("&7/ai itemsadder <spec> - Create ItemsAdder item");
+            sender.sendMessage("&7/ai oraxen <spec> - Create Oraxen item");
+            sender.sendMessage("&7/ai mythicmobs <spec> - Create MythicMobs item");
         }
         if (PermissionManager.hasTradePermission(sender)) {
             sender.sendMessage(translations.getWithColor("help.trade"));
@@ -256,6 +266,156 @@ public class AICommand implements CommandExecutor {
         
         itemCreator.createTrade(spec).thenAccept(result -> {
             sender.sendMessage(translations.getWithColor("success.trade").replace("{result}", result));
+        }).exceptionally(e -> {
+            sender.sendMessage(translations.getWithColor("error.ai-failure").replace("{error}", e.getMessage()));
+            return null;
+        });
+    }
+
+    private void handleMMOItem(CommandSender sender, String[] args) {
+        if (!PermissionManager.hasItemPermission(sender)) {
+            sender.sendMessage(translations.getWithColor("error.no-permission"));
+            return;
+        }
+
+        if (itemCreator == null) {
+            sender.sendMessage(translations.getWithColor("error.feature-disabled"));
+            return;
+        }
+
+        if (!checkRateLimit(sender)) return;
+
+        if (args.length < 2) {
+            sender.sendMessage(translations.getWithColor("error.invalid-arguments"));
+            return;
+        }
+
+        String spec = String.join(" ", java.util.Arrays.copyOfRange(args, 1, args.length));
+        
+        sender.sendMessage(translations.getWithColor("prefix") + "Creating MMOItem...");
+        
+        itemCreator.createMMOItem(spec).thenAccept(result -> {
+            sender.sendMessage(translations.getWithColor("&a") + result);
+        }).exceptionally(e -> {
+            sender.sendMessage(translations.getWithColor("error.ai-failure").replace("{error}", e.getMessage()));
+            return null;
+        });
+    }
+
+    private void handleEnchantment(CommandSender sender, String[] args) {
+        if (!PermissionManager.hasItemPermission(sender)) {
+            sender.sendMessage(translations.getWithColor("error.no-permission"));
+            return;
+        }
+
+        if (itemCreator == null) {
+            sender.sendMessage(translations.getWithColor("error.feature-disabled"));
+            return;
+        }
+
+        if (!checkRateLimit(sender)) return;
+
+        if (args.length < 2) {
+            sender.sendMessage(translations.getWithColor("error.invalid-arguments"));
+            return;
+        }
+
+        String spec = String.join(" ", java.util.Arrays.copyOfRange(args, 1, args.length));
+        
+        sender.sendMessage(translations.getWithColor("prefix") + "Creating enchantment...");
+        
+        itemCreator.createEnchantment(spec).thenAccept(result -> {
+            sender.sendMessage(translations.getWithColor("&a") + result);
+        }).exceptionally(e -> {
+            sender.sendMessage(translations.getWithColor("error.ai-failure").replace("{error}", e.getMessage()));
+            return null;
+        });
+    }
+
+    private void handleItemsAdder(CommandSender sender, String[] args) {
+        if (!PermissionManager.hasItemPermission(sender)) {
+            sender.sendMessage(translations.getWithColor("error.no-permission"));
+            return;
+        }
+
+        if (itemCreator == null) {
+            sender.sendMessage(translations.getWithColor("error.feature-disabled"));
+            return;
+        }
+
+        if (!checkRateLimit(sender)) return;
+
+        if (args.length < 2) {
+            sender.sendMessage(translations.getWithColor("error.invalid-arguments"));
+            return;
+        }
+
+        String spec = String.join(" ", java.util.Arrays.copyOfRange(args, 1, args.length));
+        
+        sender.sendMessage(translations.getWithColor("prefix") + "Creating ItemsAdder item...");
+        
+        itemCreator.createItemsAdder(spec).thenAccept(result -> {
+            sender.sendMessage(translations.getWithColor("&a") + result);
+        }).exceptionally(e -> {
+            sender.sendMessage(translations.getWithColor("error.ai-failure").replace("{error}", e.getMessage()));
+            return null;
+        });
+    }
+
+    private void handleOraxen(CommandSender sender, String[] args) {
+        if (!PermissionManager.hasItemPermission(sender)) {
+            sender.sendMessage(translations.getWithColor("error.no-permission"));
+            return;
+        }
+
+        if (itemCreator == null) {
+            sender.sendMessage(translations.getWithColor("error.feature-disabled"));
+            return;
+        }
+
+        if (!checkRateLimit(sender)) return;
+
+        if (args.length < 2) {
+            sender.sendMessage(translations.getWithColor("error.invalid-arguments"));
+            return;
+        }
+
+        String spec = String.join(" ", java.util.Arrays.copyOfRange(args, 1, args.length));
+        
+        sender.sendMessage(translations.getWithColor("prefix") + "Creating Oraxen item...");
+        
+        itemCreator.createOraxen(spec).thenAccept(result -> {
+            sender.sendMessage(translations.getWithColor("&a") + result);
+        }).exceptionally(e -> {
+            sender.sendMessage(translations.getWithColor("error.ai-failure").replace("{error}", e.getMessage()));
+            return null;
+        });
+    }
+
+    private void handleMythicMobs(CommandSender sender, String[] args) {
+        if (!PermissionManager.hasItemPermission(sender)) {
+            sender.sendMessage(translations.getWithColor("error.no-permission"));
+            return;
+        }
+
+        if (itemCreator == null) {
+            sender.sendMessage(translations.getWithColor("error.feature-disabled"));
+            return;
+        }
+
+        if (!checkRateLimit(sender)) return;
+
+        if (args.length < 2) {
+            sender.sendMessage(translations.getWithColor("error.invalid-arguments"));
+            return;
+        }
+
+        String spec = String.join(" ", java.util.Arrays.copyOfRange(args, 1, args.length));
+        
+        sender.sendMessage(translations.getWithColor("prefix") + "Creating MythicMobs item...");
+        
+        itemCreator.createMythicMobs(spec).thenAccept(result -> {
+            sender.sendMessage(translations.getWithColor("&a") + result);
         }).exceptionally(e -> {
             sender.sendMessage(translations.getWithColor("error.ai-failure").replace("{error}", e.getMessage()));
             return null;
