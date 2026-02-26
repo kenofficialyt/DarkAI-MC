@@ -21,3 +21,22 @@ pom.xml.asc
 # Plugin runtime
 *.jar
 !target/*.jar
+
+# Compiled class file
+*.class
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Mobile Tools for Java
+.mtj.tmp/
+
+# VM crash logs
+hs_err_pid*
+replay_pid*
